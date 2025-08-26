@@ -1,7 +1,3 @@
- Here’s a **draft README.md** you could drop into your GitHub repo. It documents the 12-week plan, includes resources, projects, and adds **Definition of Done** for each week so you can track progress.
-
----
-
 # 🛠️ Learning Journey: Building a Tool-Using Edge LLM (12 Weeks)
 
 This repo documents my **12-week self-study & build plan** for creating a **tiny, domain-tuned, tool-calling LLM** that can run locally or on edge devices.
