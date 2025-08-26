@@ -1,10 +1,27 @@
-# Tokenizer Notes
 
-Hugging face mainly uses 3 types of tokenizers:
+# Table of contents
 
+- [Tokenizers](#tokenizers)
+- [Types of tokenizers](#types-of-tokenizers)
+  - [Rule based tokenizers](#rule-based-tokenizers)
+  - [Character based](#character-based)
+  - [Subword Tokenization](#subword-tokenization)
+- [Byte-Pair Encoding (BPE)](#byte-pair-encoding-bpe)
+  - [Example](#example)
+  - [Byte-level BPE](#byte-level-bpe)
+- [WordPiece](#wordpiece)
+- [Unigram](#unigram)
+- [SentencePiece](#sentencepiece)
+  - [About](#about)
+  - [Paper Summary](#paper-summary)
+  - [Characteristics of the Library](#characteristics-of-the-library)
+
+
+# Tokenizers
+Tokenizing a text is splitting it into words or subwords, which then are converted to ids through a look-up table. We will be focusing on three tokenizers:
+- Byte-Pair Encoding (BPE)
 - WordPiece
 - SentencePiece
-- Byte-Pair Encoding (BPE)
 
 ## Types of tokenizers
 
@@ -125,13 +142,13 @@ Assuming, that the Byte-Pair Encoding training would stop at this point, the lea
 
 A base vocabulary that includes all possible base characters can be quite large if e.g. all unicode characters are considered as base characters. To have a better base vocabulary, GPT-2 uses bytes as the base vocabulary, which is a clever trick to force the base vocabulary to be of size 256 while ensuring that every base character is included in the vocabulary. With some additional rules to deal with punctuation, the GPT2’s tokenizer can tokenize every text without the need for the <unk> symbol. GPT-2 has a vocabulary size of 50,257, which corresponds to the 256 bytes base tokens, a special end-of-text token and the symbols learned with 50,000 merges.
 
-### WordPiece
+## WordPiece
 
 WordPiece is the subword tokenization algorithm used for BERT, DistilBERT, and Electra. The algorithm was outlined in Japanese and Korean Voice Search (Schuster et al., 2012) and is very similar to BPE. WordPiece first initializes the vocabulary to include every character present in the training data and progressively learns a given number of merge rules. In contrast to BPE, WordPiece does not choose the most frequent symbol pair, but the one that maximizes the likelihood of the training data once added to the vocabulary.
 
 So what does this mean exactly? Referring to the previous example, maximizing the likelihood of the training data is equivalent to finding the symbol pair, whose probability divided by the probabilities of its first symbol followed by its second symbol is the greatest among all symbol pairs. E.g. "u", followed by "g" would have only been merged if the probability of "ug" divided by "u", "g" would have been greater than for any other symbol pair. Intuitively, WordPiece is slightly different to BPE in that it evaluates what it loses by merging two symbols to ensure it’s worth it.
 
-### Unigram
+## Unigram
 
 Unigram is a subword tokenization algorithm introduced in Subword Regularization: Improving Neural Network Translation Models with Multiple Subword Candidates (Kudo, 2018). In contrast to BPE or WordPiece, Unigram initializes its base vocabulary to a large number of symbols and progressively trims down each symbol to obtain a smaller vocabulary. The base vocabulary could for instance correspond to all pre-tokenized words and the most common substrings. Unigram is not used directly for any of the models in the transformers, but it’s used in conjunction with SentencePiece.
 
@@ -149,15 +166,17 @@ Those probabilities are defined by the loss the tokenizer is trained on. Assumin
 L = ∑(i=1..N)log(∑(x∈S(xi)) p(x))
 ```
 
-### SentencePiece
+## SentencePiece
+[SentencePiece Paper](https://arxiv.org/pdf/1808.06226)
+
+### About
 
 All tokenization algorithms described so far have the same problem: It is assumed that the input text uses spaces to separate words. However, not all languages use spaces to separate words. One possible solution is to use language specific pre-tokenizers, e.g. XLM uses a specific Chinese, Japanese, and Thai pre-tokenizer. To solve this problem more generally, SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing (Kudo et al., 2018) treats the input as a raw input stream, thus including the space in the set of characters to use. It then uses the BPE or unigram algorithm to construct the appropriate vocabulary.
 
 The XLNetTokenizer uses SentencePiece for example, which is also why in the example earlier the "▁" character was included in the vocabulary. Decoding with SentencePiece is very easy since all tokens can just be concatenated and "▁" is replaced by a space.
 
-#### Paper Summary
+### Paper Summary
 
-[SentencePiece Paper](https://arxiv.org/pdf/1808.06226)
 
 It comprises of for main components:
 
@@ -174,7 +193,7 @@ It comprises of for main components:
 
 **Decoder**: It converts the subword sequence into the normalized text.
 
-##### Characteristics of the Library
+#### Characteristics of the Library
 
 - Lossless Tokenization: Sentence piece implements the Decoder as an inverse operation of the Encoder. This makes sure that all the information to reproduce the normalized text is preserved in the encoder's output. For sake of clarity, SentencePiece first escapes the whitespace with a meta symbol _ (U+2581), and then tokenizes the input into an arbitrary subword sequence, For example "Hello World." -> [Hello] [_wor] [ld] [.]
 - Efficient subword training and segmentation: SentencePiece employs several speed-up techniques both for training and segementation to make lossless tokenization with a large amount of raw data. For example given an input sentence (or word) of length *N*,
