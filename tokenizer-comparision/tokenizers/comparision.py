@@ -1,6 +1,6 @@
 from .models import Tokenizer
 
-class TokenizerComparision:
+class TokenizerComparator:
     def __init__(self, tokenizers: list[Tokenizer]):
         self.tokenizers = tokenizers
 
