@@ -1,4 +1,3 @@
-
 # Table of contents
 
 - [Tokenizers](#tokenizers)
@@ -16,9 +15,10 @@
   - [Paper Summary](#paper-summary)
   - [Characteristics of the Library](#characteristics-of-the-library)
 
-
 # Tokenizers
+
 Tokenizing a text is splitting it into words or subwords, which then are converted to ids through a look-up table. We will be focusing on three tokenizers:
+
 - Byte-Pair Encoding (BPE)
 - WordPiece
 - SentencePiece
@@ -103,7 +103,7 @@ Another example
 
 ## Byte-Pair Encoding (BPE)
 
-BPE relies on a pre-tokenizer that splits the training data into words. This can be as simple as space tokenization. After pre-tokenization, a set of unique words has been created and the frequency with which each word occured in the training data has been determined. Next, BPE create a base vocabulary consisting of all symbols that occur in the set of unique words and learns merge rules to form a new symbol from teo symbols of the base vocabulary. It does so until the vocab has attained the desired vocab size. *NOTE: The desired vocab size is a hyperparameter to define before training the tokenizer*
+BPE relies on a pre-tokenizer that splits the training data into words. This can be as simple as space tokenization. After pre-tokenization, a set of unique words has been created and the frequency with which each word occured in the training data has been determined. Next, BPE create a base vocabulary consisting of all symbols that occur in the set of unique words and learns merge rules to form a new symbol from two symbols of the base vocabulary. It does so until the vocab has attained the desired vocab size. *NOTE: The desired vocab size is a hyperparameter to define before training the tokenizer*
 
 #### Example
 
@@ -167,6 +167,7 @@ L = ∑(i=1..N)log(∑(x∈S(xi)) p(x))
 ```
 
 ## SentencePiece
+
 [SentencePiece Paper](https://arxiv.org/pdf/1808.06226)
 
 ### About
@@ -176,7 +177,6 @@ All tokenization algorithms described so far have the same problem: It is assume
 The XLNetTokenizer uses SentencePiece for example, which is also why in the example earlier the "▁" character was included in the vocabulary. Decoding with SentencePiece is very easy since all tokens can just be concatenated and "▁" is replaced by a space.
 
 ### Paper Summary
-
 
 It comprises of for main components:
 
@@ -208,10 +208,10 @@ It comprises of for main components:
   - `<pad>`: padding
     We can also define custom meta symbols to encode contextual information as virtual tokens.
 - Customizable character normalization: By default SentencePiece normalizes the input text with the Unicode NFKC normalization. The normalization rules are specified with the `--normalization_rule_name=nfkc` flag of `spm_train`. The normalization in SentencePiece is implemented with string-to-string mapping and leftmost longest matching. The normalization rules are compiled into a finite state transducer to perform an efficient normalization. SentencePiece supports custom normalization rules defined as a TSV file. When there are ambiguities in the conversion, the longest rule is applied. User defined TSV files are specified with the `--normalization_rule_tsv=<file>` flag of `spm_train`.
-    ```txt
-    NOTE:
-    1. The Original NFKC normalization required CCC (Canonical Combining Class) reordering, which is hard to model in a finite state transducer. SentencePiece does not handle the full CCC reordering and only implements a subset of NFKC normalization.
 
-    2. Note the tabs are used a the delimiter for source and target sequence and spaces are used as the delimiter for individual characters.
-    ```
+  ```txt
+  NOTE:
+  1. The Original NFKC normalization required CCC (Canonical Combining Class) reordering, which is hard to model in a finite state transducer. SentencePiece does not handle the full CCC reordering and only implements a subset of NFKC normalization.
 
+  2. Note the tabs are used a the delimiter for source and target sequence and spaces are used as the delimiter for individual characters.
+  ```
