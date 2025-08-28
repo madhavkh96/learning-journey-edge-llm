@@ -1,10 +1,10 @@
 from .models import Tokenizer
-
+from typing import Dict
 class TokenizerComparator:
     def __init__(self, tokenizers: list[Tokenizer]):
         self.tokenizers = tokenizers
 
-    def compare_tokenization_results(self, text: str):
+    def compare_tokenization_results(self, text: str) -> Dict[str, str | float]:
         results = {
             "tokenizer": [],
             "vocab_size": [],
@@ -30,6 +30,17 @@ class TokenizerComparator:
             results["time"].append(tokenizer.get_tokenization_time(path))
         return results
     
+    def compare_training_time(self, path: str):
+        results = {
+            "tokenizer": [],
+            "time": [],
+        }
+
+        for tokenizer in self.tokenizers:
+            results["tokenizer"].append(tokenizer.name)
+            results["time"].append(tokenizer.get_training_time(path))
+        return results
+    
     def print_comparisions(self, results: dict[str, list], title: str, print_header: bool = True):
         if print_header:
             print(title)
@@ -49,6 +60,8 @@ class TokenizerComparator:
             for key in results.keys():
                 if key == "compression_ratio":
                     print(f"{results[key][i]:<20.2f}|", end="")
+                elif key == "time":
+                    print(f"{results[key][i]:<20.4f}|", end="")
                 elif key == "tokenizer":
                     print(f"|{results[key][i]:<35}|", end="")
                 else:

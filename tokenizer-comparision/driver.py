@@ -76,8 +76,8 @@ def compare_tokenization_bpe_models():
     comparators.print_comparisions(results, "Tokenization Results")
 
 @click.command()
-@click.option('--vocab_size', default='100', help='Vocab size for each model')
-def compare_training_time_models(vocab_size):
+@click.option('--vocab-size', default='100', help='Vocab size for each model')
+def compare_tokenization_time_models(vocab_size):
     tokenizers = []
     for name in [f'custom_bpe_{vocab_size}', f'spm_bpe_{vocab_size}']:
         if 'custom_bpe' in name:
@@ -87,13 +87,31 @@ def compare_training_time_models(vocab_size):
         else:
             NotImplementedError(f"Currently Tokenizer {name} not supported")
     comparator = TokenizerComparator(tokenizers)
-    results = comparator.compare_tokenization_time('./data/train.txt')
+    results = comparator.compare_tokenization_time('./data/test.txt')
+    comparator.print_comparisions(results, "Tokenization Time Results")
+
+
+@click.command()
+@click.option('--vocab-size', default=100, help='Vocab size for each model')
+def compare_training_time_models(vocab_size):
+    tokenizers = []
+    for name in [f'custom_bpe_{vocab_size}', f'spm_bpe_{vocab_size}']:
+        if 'custom_bpe' in name:
+            tokenizers.append(BPETokenizer(name, vocab_size))
+        elif 'spm_bpe' in name:
+            tokenizers.append(SentencePieceWrapper(name, vocab_size, persist=False))
+        else:
+            NotImplementedError(f"Currently Tokenizer {name} not supported")
+    comparator = TokenizerComparator(tokenizers)
+    results = comparator.compare_training_time('./data/train.txt')
     comparator.print_comparisions(results, "Training Time Results")
+
 
 tokenizer.add_command(train_bpe)
 tokenizer.add_command(compare_tokenization_bpe_models)
 tokenizer.add_command(train_sentencepiece)
+tokenizer.add_command(compare_tokenization_time_models)
 tokenizer.add_command(compare_training_time_models)
-    
+
 if __name__ == '__main__':
     tokenizer()

@@ -25,7 +25,7 @@ class BPETokenizer(Tokenizer):
 
     def train(self, path: str):
 
-        text = self.__load_file_from_path(path)
+        text = self._load_file_from_path(path)
         
         if not self.vocab_size:
             raise ValueError("Vocab size can't be none.")
