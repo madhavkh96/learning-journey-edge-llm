@@ -20,27 +20,31 @@ class TokenizerComparator:
             results["compression_ratio"].append(tokenizer.get_compression_ratio(text))
         return results
     
-    def compare_tokenization_time(self, text: str):
+    def compare_tokenization_time(self, path: str):
         results = {
             "tokenizer": [],
             "time": [],
         }
         for tokenizer in self.tokenizers:
             results["tokenizer"].append(tokenizer.name)
-            results["time"].append(tokenizer.get_tokenization_time(text))
+            results["time"].append(tokenizer.get_tokenization_time(path))
         return results
     
     def print_comparisions(self, results: dict[str, list], title: str, print_header: bool = True):
         if print_header:
             print(title)
-        print("|" + "="*120)
+
+        divider = "|" + "="*35 + "="*22*(len(results.keys()) - 1)
+
+        print(divider)
+
         for key in results.keys():
             if key == "tokenizer":
                 print(f"|{key:<35}|", end="")
             else:
                 print(f"{key:<20}|", end="")
         print()
-        print("|" + "="*120)
+        print(divider)
         for i in range(len(results["tokenizer"])):
             for key in results.keys():
                 if key == "compression_ratio":
@@ -50,6 +54,6 @@ class TokenizerComparator:
                 else:
                     print(f"{results[key][i]:<20}|", end="")
             print()
-        print("|" + "-"*120)
+        print(divider)
 
     

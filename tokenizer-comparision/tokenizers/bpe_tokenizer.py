@@ -18,14 +18,15 @@ TIME COMPLEXITY:
 
 class BPETokenizer(Tokenizer):
     def __init__(self, name: str | None = None, vocab_size: int | None = None):
-        super().__init__(name)
-        self.vocab_size = vocab_size
+        super().__init__(name, vocab_size)
         self.merge_rules = []
         self.vocab_list = []
         self.token_to_id = {}
 
-    def train(self, text: str):
+    def train(self, path: str):
 
+        text = self.__load_file_from_path(path)
+        
         if not self.vocab_size:
             raise ValueError("Vocab size can't be none.")
         
